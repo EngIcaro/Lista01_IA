@@ -14,19 +14,20 @@
 class CampoAtual
 {
 public:
-    bool max;                       // max = 1 quer o max
+    int max;                       // max = 1 quer o max
     int alfa;                       // alfa =  quer o
-    bool elemento;                  // elemeto = 1 é o X!
+    int peso;
+    int elemento;                  // elemeto = 1 é o X!
     int funcAvaliacao;
     int campo[3][3];
     CampoAtual *father;
-    CampoAtual(bool maxx,bool elementoo ,int campoo[3][3], CampoAtual *fatherr){
+    CampoAtual(int maxx, int elementoo, int pesoo,int campoo[3][3], CampoAtual *fatherr){
        elemento = elementoo;
        max = maxx;
        if(max)
-          alfa = -150;
+          alfa = -1500;
        else
-          alfa = 150;
+          alfa = 1500;
        for(int i =0; i< 3; i++){
            for(int j =0; j<3; j++){
                campo[i][j] = campoo[i][j];
@@ -34,44 +35,72 @@ public:
        }
        funcAvaliacao = 0;
        father = fatherr;
+       peso = pesoo;
     }
 
     bool eFolha(){
         for(int i =0; i< 3; i++){
+            if((campo[i][0] == campo[i][1]) && (campo[i][1] == campo[i][2]) && campo[i][2] != -1)
+              return true;
+        }
+        for(int i =0; i< 3; i++){
+            if((campo[0][i] == campo[1][i]) && (campo[1][i] == campo[2][i]) && campo[2][i] != -1)
+              return true;
+        }
+        if((campo[0][0] == campo[1][1]) && (campo[1][1] == campo[2][2]) && campo[2][2] != -1){
+              return true;
+        }
+        if((campo[2][0] == campo[1][1]) && (campo[1][1] == campo[0][2]) && campo[1][1] != -1){
+              return true;
+        }
+        for(int i =0; i< 3; i++){
             for(int j =0; j<3; j++){
-                if(campo[i][j] == -1)
+                  if(campo[i][j] == -1){
                     return false;
+                  }
             }
         }
         return true;
     }
     void gerarAvaliacao(){
-        // Percorrer todas as linhas
-        for(int i =0; i< 3; i++){
-            for(int j =0; j<3; j++){
-                if(campo[i][j] == 1)
-                    funcAvaliacao++;
-                else if(campo[i][j] == 0)
-                    funcAvaliacao--;
-            }
-        }
-        // Percorrer todas as colunas
-        for(int i =0; i< 3; i++){
-            for(int j =0; j<3; j++){
-                if(campo[j][i] == 1)
-                    funcAvaliacao++;
-                else if(campo[j][i] == 0)
-                    funcAvaliacao--;
-            }
-        }
-        // Percorrer todas as colunas
-        for(int i =0; i< 3; i++){
-                if(campo[i][i] == 1)
-                    funcAvaliacao++;
-                else if(campo[i][i] == 0)
-                    funcAvaliacao--;
-        }
 
+      for(int i =0; i< 3; i++){
+          if((campo[i][0] == campo[i][1]) && (campo[i][1] == campo[i][2]) && (campo[i][2] == 1))
+            funcAvaliacao = 1 * peso;
+
+      }
+      for(int i =0; i< 3; i++){
+          if((campo[0][i] == campo[1][i]) && (campo[1][i] == campo[2][i]) && campo[2][i] == 1)
+            funcAvaliacao = 1 * peso;
+
+      }
+      if((campo[0][0] == campo[1][1]) && (campo[1][1] == campo[2][2]) && campo[2][2] == 1){
+            funcAvaliacao = 1 * peso;
+
+      }
+      if((campo[2][0] == campo[1][1]) && (campo[1][1] == campo[0][2]) && campo[1][1] == 1){
+            funcAvaliacao = 1 * peso;
+
+      }
+      for(int i =0; i< 3; i++){
+          if((campo[i][0] == campo[i][1]) && (campo[i][1] == campo[i][2]) && campo[i][2] == 0)
+            funcAvaliacao = -1 * peso;
+
+      }
+      for(int i =0; i< 3; i++){
+          if((campo[0][i] == campo[1][i]) && (campo[1][i] == campo[2][i]) && campo[2][i] == 0)
+            funcAvaliacao = -1 * peso;
+
+      }
+      if((campo[0][0] == campo[1][1]) && (campo[1][1] == campo[2][2]) && campo[2][2] == 0){
+            funcAvaliacao = -1 * peso;
+
+      }
+      if((campo[2][0] == campo[1][1]) && (campo[1][1] == campo[0][2]) && campo[1][1] == 0){
+            funcAvaliacao = -1 * peso;
+
+      }
+      funcAvaliacao = 0;
     }
 };
 
@@ -89,12 +118,12 @@ public:
         pilhaDeCampo.clear();
         pilhaDeRetorno.clear();
     }
-    void escolherJogada(int raiz[3][3]){
+    void escolherJogada(int raiz[3][3], int mi){
         pilhaDeCampo.clear();
         pilhaDeRetorno.clear();
-        CampoAtual *campo = new CampoAtual(1,1,raiz,0);
+        CampoAtual *campo = new CampoAtual(mi,1,200,raiz,0);
         pilhaDeCampo.push(campo);
-        std::cout << pilhaDeCampo.size() << '\n';
+
         while(pilhaDeCampo.size()){
             CampoAtual *campoAtual = pilhaDeCampo.pop();
             //std::cout << campoAtual->alfa;
@@ -136,26 +165,46 @@ public:
                     for(int j=0; j<3; j++){
                         if(campoAtual->campo[i][j] == -1){
                             if(campoAtual->elemento){
-                                campoAtual->campo[i][j] = 1;
-                                CampoAtual *novoCampo = new CampoAtual(!(campoAtual->max), !(campoAtual->elemento),campoAtual->campo, campoAtual);
-                                pilhaDeCampo.push(novoCampo);
-                                campoAtual->campo[i][j] = -1;
+                                if(campoAtual->max){
+                                    campoAtual->campo[i][j] = 1;
+                                   //  std::cout << "entrei 1";
+                                    CampoAtual *novoCampo = new CampoAtual(0, 0, campoAtual->peso - 1,campoAtual->campo, campoAtual);
+                                    pilhaDeCampo.push(novoCampo);
+                                    campoAtual->campo[i][j] = -1;
+                                }
+                                else{
+                                    campoAtual->campo[i][j] = 1;
+                                  //  std::cout << "entrei 2";
+                                    CampoAtual *novoCampo = new CampoAtual(1, 0, campoAtual->peso - 1,campoAtual->campo, campoAtual);
+                                    pilhaDeCampo.push(novoCampo);
+                                    campoAtual->campo[i][j] = -1;
+                                }
                             }
                             else{
-                                campoAtual->campo[i][j] = 0;
-                                CampoAtual *novoCampo = new CampoAtual(!(campoAtual->max), !(campoAtual->elemento),campoAtual->campo, campoAtual);
-                                pilhaDeCampo.push(novoCampo);
-                                campoAtual->campo[i][j] = -1;
+                                if(campoAtual->max){
+                                 //   std::cout << "entrei 3";
+                                    campoAtual->campo[i][j] = 0;
+                                    CampoAtual *novoCampo = new CampoAtual(0, 1, campoAtual->peso - 1,campoAtual->campo, campoAtual);
+
+                                    campoAtual->campo[i][j] = -1;
+                                }
+                                else{
+                                   //  std::cout << "entrei 4";
+                                     campoAtual->campo[i][j] = 0;
+                                     CampoAtual *novoCampo = new CampoAtual(1, 1, campoAtual->peso - 1,campoAtual->campo, campoAtual);
+                                     pilhaDeCampo.push(novoCampo);
+                                     campoAtual->campo[i][j] = -1;
+                                }
                             }
                         }
                     }
                 }
             }
-            std::cout << pilhaDeCampo.size() <<" pilha de retorno: " <<pilhaDeRetorno.size() <<'\n';
+            //std::cout << pilhaDeCampo.size() <<" pilha de retorno: " <<pilhaDeRetorno.size() <<'\n';
         }
         //std::cout << "aquiiii" <<pilhaDeRetorno.size();
         while(pilhaDeRetorno.size()){
-            std::cout  << pilhaDeRetorno.size() << '\n';
+            //std::cout  << pilhaDeRetorno.size() << '\n';
             CampoAtual *campoAtual = pilhaDeRetorno.pop();
             if(campoAtual->father->max){
                 if(campoAtual->alfa > campoAtual->father->alfa){
@@ -172,6 +221,13 @@ public:
             else{
                 if(campoAtual->alfa < campoAtual->father->alfa){
                     campoAtual->father->alfa = campoAtual->alfa;
+                    if(campoAtual->father->father == 0){
+                        for(int i=0; i<3; i++){
+                            for(int j=0; j<3; j++){
+                                campoFinal[i][j] = campoAtual->campo[i][j];
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -204,12 +260,12 @@ int main(int argc, char *argv[])
     //std::cin  >> linha >> coluna;
     //  matriz[linha][coluna] = 0;
     MiniMax *mini = new MiniMax();
-    mini->escolherJogada(matriz);
+    mini->escolherJogada(matriz, 1);
     for(int i=0; i<5; i++){
         std::cout << "escolha linha e coluna respectivamente";
         std::cin  >> linha >> coluna;
         mini->campoFinal[linha][coluna] = 0;
-        mini->escolherJogada(mini->campoFinal);
+        mini->escolherJogada(mini->campoFinal, 0);
     }
     return 0;
     return a.exec();
