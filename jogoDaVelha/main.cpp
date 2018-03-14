@@ -63,44 +63,56 @@ public:
         return true;
     }
     void gerarAvaliacao(){
-
+        int flag =0;
       for(int i =0; i< 3; i++){
-          if((campo[i][0] == campo[i][1]) && (campo[i][1] == campo[i][2]) && (campo[i][2] == 1))
+          if((campo[i][0] == campo[i][1]) && (campo[i][1] == campo[i][2]) && (campo[i][2] == 1)){
             funcAvaliacao = 1 * peso;
+            flag =1;
+          }
 
       }
       for(int i =0; i< 3; i++){
-          if((campo[0][i] == campo[1][i]) && (campo[1][i] == campo[2][i]) && campo[2][i] == 1)
+          if((campo[0][i] == campo[1][i]) && (campo[1][i] == campo[2][i]) && campo[2][i] == 1){
             funcAvaliacao = 1 * peso;
+            flag =1;
+          }
 
       }
       if((campo[0][0] == campo[1][1]) && (campo[1][1] == campo[2][2]) && campo[2][2] == 1){
             funcAvaliacao = 1 * peso;
+            flag = 1;
 
       }
       if((campo[2][0] == campo[1][1]) && (campo[1][1] == campo[0][2]) && campo[1][1] == 1){
             funcAvaliacao = 1 * peso;
-
+            flag = 1;
       }
       for(int i =0; i< 3; i++){
-          if((campo[i][0] == campo[i][1]) && (campo[i][1] == campo[i][2]) && campo[i][2] == 0)
+          if((campo[i][0] == campo[i][1]) && (campo[i][1] == campo[i][2]) && campo[i][2] == 0){
             funcAvaliacao = -1 * peso;
-
+            flag = 1;
+          }
       }
       for(int i =0; i< 3; i++){
-          if((campo[0][i] == campo[1][i]) && (campo[1][i] == campo[2][i]) && campo[2][i] == 0)
+          if((campo[0][i] == campo[1][i]) && (campo[1][i] == campo[2][i]) && campo[2][i] == 0){
             funcAvaliacao = -1 * peso;
+            flag =1;
+          }
 
       }
       if((campo[0][0] == campo[1][1]) && (campo[1][1] == campo[2][2]) && campo[2][2] == 0){
+            flag = 1;
             funcAvaliacao = -1 * peso;
 
       }
       if((campo[2][0] == campo[1][1]) && (campo[1][1] == campo[0][2]) && campo[1][1] == 0){
             funcAvaliacao = -1 * peso;
+            flag = 1;
 
       }
-      funcAvaliacao = 0;
+      if(flag == 0){
+            funcAvaliacao = 0;
+      }
     }
 };
 
@@ -210,6 +222,7 @@ public:
                 if(campoAtual->alfa > campoAtual->father->alfa){
                     campoAtual->father->alfa = campoAtual->alfa;
                     if(campoAtual->father->father == 0){
+                        //std::cout << "meu filho tem: " << campoAtual->alfa << " e meu atual: " << campoAtual->father->alfa;
                         for(int i=0; i<3; i++){
                             for(int j=0; j<3; j++){
                                 campoFinal[i][j] = campoAtual->campo[i][j];
@@ -250,22 +263,35 @@ int main(int argc, char *argv[])
 {
     int linha, coluna;
     QCoreApplication a(argc, argv);
-    int matriz[3][3];
-    for(int i=0; i<3; i++){
-        for(int j=0; j<3; j++){
-            matriz[i][j] = -1;
-        }
-    }
+    std::cout << "OLÁ, EU SOU O PROFESSOR DUMBLEDORE, SOU CAMPEÃO MUNDIAL DO JOGO DA VELHA!\nX É REPRESENTADO PELO VALOR 1, O É "
+                 "REPRESENTADO PELO VALOR 0, CAMPO VAZIO\nPELO VALOR -1\nVAMOS JOGAR UMA PARTIDA!?\n";
     //std::cout << "escolha linha e coluna respectivamente";
     //std::cin  >> linha >> coluna;
     //  matriz[linha][coluna] = 0;
     MiniMax *mini = new MiniMax();
-    mini->escolherJogada(matriz, 1);
+  //  mini->escolherJogada(matriz, 1);
+    for(int i=0; i<3; i++){
+        for(int j=0; j<3; j++){
+            mini->campoFinal[i][j] = -1;
+                std::cout << " "<<mini->campoFinal[i][j] << " | ";
+        }
+        std::cout << "\n";
+    }
     for(int i=0; i<5; i++){
-        std::cout << "escolha linha e coluna respectivamente";
+        std::cout << "\nESCOLHA UMA LINHA E COLUNA RESPECTIVAMENTE, APENAS VALORES ENTRE [0, 2] ";
         std::cin  >> linha >> coluna;
         mini->campoFinal[linha][coluna] = 0;
-        mini->escolherJogada(mini->campoFinal, 0);
+        CampoAtual *novoCampoo = new CampoAtual(1, 1,0,mini->campoFinal, 0);
+        if(novoCampoo->eFolha()){
+            std::cout << "DEU EMPATE\n";
+            return 0;
+        }
+        mini->escolherJogada(mini->campoFinal, 1);
+        CampoAtual *novoCampo = new CampoAtual(1, 1,0,mini->campoFinal, 0);
+        if(novoCampo->eFolha()){
+            std::cout << "EU GANHEI\n";
+            return 0;
+        }
     }
     return 0;
     return a.exec();
