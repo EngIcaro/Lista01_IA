@@ -22,10 +22,7 @@ public:
 
 double obterDistEuclidiana(iris ind1, iris ind2)
 {
-	/*
-		a distância euclidiana é a raiz quadrada da soma das
-		diferenças dos valores dos atributos elevado ao quadrado
-	*/
+
 
 	double soma = pow((ind1.sepalLen - ind2.sepalLen), 2) +
 				  pow((ind1.sepalWidht - ind2.sepalWidht), 2) +
@@ -40,7 +37,7 @@ double obterDistEuclidiana(iris ind1, iris ind2)
 string classificarAmostra(vector<iris>& allIris,
 						  iris novo_exemplo, int K)
 {
-	// se o K for par decrementa
+
 	if(K % 2 == 0)
 	{
 		K--;
@@ -48,37 +45,21 @@ string classificarAmostra(vector<iris>& allIris,
 			K = 1;
 	}
 
-	// obtém o tamanho do vetor
+
 	int tam_vet = allIris.size();
 
-	/*
-		set de pairs da distância de cada indivíduo
-		do conjunto de treinamento para o novo exemplo
-		cada pair é composto pela distância e o índice
-		do indivíduo no vetor
-	*/
+
 	set<pair<double, int> > dist_iris;
 
-	/*
-		calcula-se a distância euclidiana do novo exemplo
-		para cada amostra do conjunto de treinamento
-	*/
+
 	for(int i = 0; i < tam_vet; i++)
 	{
 		double dist = obterDistEuclidiana(allIris[i], novo_exemplo);
 		dist_iris.insert(make_pair(dist, i));
 	}
-	/*
-	para decidir a qual classe pertence o novo exemplo,
-	basta verificar a classe mais frequente dos K
-	vizinhos mais próximos
-	*/
+
     set<pair<double, int> >::iterator it;
-	/*
-		o contador de Iris-setosa estará no índice 0,
-		o contador de Iris-versicolor estará no índice 1
-		e o contador de Iris-virginica estará no índice 2
-	*/
+
 	vector<int> cont_classes(3);
 
 	int contK = 0;
@@ -119,7 +100,7 @@ int main(){
 
     int k = 3;
 
-    int tam_treinamento = 100;
+    int tam_treinamento = 125;
 
     string classe;
     double a, b, c, d;
@@ -136,9 +117,7 @@ int main(){
         g = cin.get();
         cin >> classe;
 		allIris.push_back(iris(a, b, c, d, classe));
-//        cout << allIris[i].sepalLen << "," << allIris[i].sepalWidht << ","
-//             << allIris[i].petalLen << "," << allIris[i].petalWidht <<"," << allIris[i].classe<<"\n";
-	}
+    }
 
     int acertos = 0;
 
